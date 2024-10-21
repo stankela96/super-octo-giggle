@@ -9,10 +9,6 @@ export class BitcoinPriceService {
   private readonly BINANCE_API_URL =
     'https://api.binance.com/api/v3/ticker/bookTicker?symbol=BTCUSDT';
 
-  private readonly serviceCommission: number = Number(
-    process.env.SERVICE_COMMISSION,
-  );
-
   private updateFrequency: number;
 
   private readonly logger = new Logger(BitcoinPriceService.name);
@@ -26,6 +22,7 @@ export class BitcoinPriceService {
       );
 
       this.latestPrice = this.calculatePrices(response.data);
+
       this.logger.log('Latest Price: ' + JSON.stringify(this.latestPrice));
     } catch (error) {
       this.logger.error('Error fetching data from Binance API:', error.message);
@@ -46,8 +43,10 @@ export class BitcoinPriceService {
     const bid: number = parseFloat(bidPrice);
     const ask: number = parseFloat(askPrice);
 
-    const commissionedBid: number = bid * (1 - this.serviceCommission);
-    const commissionedAsk: number = ask * (1 + this.serviceCommission);
+    const serviceCommission = Number.parseFloat(process.env.SERVICE_COMMISSION);
+
+    const commissionedBid = bid * (1 - serviceCommission);
+    const commissionedAsk = ask * (1 + serviceCommission);
 
     return {
       commissionedBid: commissionedBid.toFixed(2),

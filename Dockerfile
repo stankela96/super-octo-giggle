@@ -1,6 +1,11 @@
 FROM node:20-alpine AS build
 
+ENV SERVICE_COMMISSION=0.0001
+ENV UPDATE_FREQUENCY=10
+ENV PORT=3000
+
 WORKDIR /app
+
 COPY package*.json ./
 RUN npm install
 COPY . .
@@ -13,7 +18,9 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package*.json ./
 
-ENV NODE_ENV=production
-CMD ["node", "dist/main"]
 
-EXPOSE 3000
+ENV NODE_ENV=production
+
+EXPOSE 8080
+
+CMD ["node", "dist/main"]
